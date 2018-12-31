@@ -1,7 +1,19 @@
-8BKC SUDOKU
+8bkc Sudoku
 ===========
 
-This is an implementation of Sudoku for the PocketSprite. It also happens to be my first time ever using C, so hopefully I did okay!
+This is Sudoku for the PocketSprite. It also happens to be my first time ever using C, so hopefully I did okay!
+
+Todo:
+* ~~Board~~
+* ~~Cursor~~
+* ~~Flags~~
+* ~~Number chooser~~
+* ~~Solver/Generator~~
+* !! Split into multiple files !!
+* Main menu
+* Difficulty levels
+* Pause menu
+* Save states
+* Theming and configuration
 
 Made using the PocketSprite SDK (https://github.com/PocketSprite/8bkc-sdk).
-
