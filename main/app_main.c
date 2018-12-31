@@ -15,8 +15,9 @@
  Sudoku.
 */
 
-
 static int grid[9][9];
+static int full_grid[9][9];
+static int game_grid[9][9];
 static int mark[9][9][10];
 
 int rgb(int r, int g, int b) {
@@ -232,10 +233,6 @@ void app_main() {
 	kchal_init();
 	kcugui_init();
 	srand((int)time(NULL));
-
-	static int grid[9][9];
-	static int full_grid[9][9];
-	static int game_grid[9][9];
 
 	// Generate grid
 	gen_grid();
