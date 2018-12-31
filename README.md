@@ -16,4 +16,4 @@ Todo:
 * Save states
 * Theming and configuration
 
-Made using the PocketSprite SDK (https://github.com/PocketSprite/8bkc-sdk).
+Made with ♥ using the PocketSprite SDK (https://github.com/PocketSprite/8bkc-sdk).
