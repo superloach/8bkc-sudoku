@@ -1,0 +1,63 @@
+#include <time.h>
+
+static int grid[9][9];
+
+int Fill(int* row, int* col) {
+	for (int i = 0; i < 9; i++) {
+		for (int j = 0; j < 9; j++) {
+			if (grid[i][j] == 0) {
+				*row = i;
+				*col = j;
+				return 1;
+			}
+		}
+	}
+	return 0;
+}
+
+int check_neighbors (int num, int srow, int scol, int row, int col) {
+	for (int i = 0; i < 9; i++) {
+		if(grid[row][i] == num) return 1;
+		if(grid[i][col] == num) return 2;
+	}
+	for (int i = 0; i < 3; i++) {
+		for (int j = 0; j < 3; j++) {
+			if (grid[i + srow][j + scol] == num) return 3;
+		}
+	}
+	return 0;
+}   
+
+int fill_cells() {
+	print_grid();
+	for (int i = 0; i < 5000000; i++) {
+		if (i == 0) i = 1;
+	}
+	int row = 0;
+	int col = 0;
+	if (Fill(&row, &col) == 0) return 1;
+	for (int i = 1; i <= 9; i++) {
+		if(check_neighbors(i, row - row % 3, col - col % 3, row, col) == 0) {
+			grid[row][col] = i;
+			if (fill_cells() == 1) return 1;
+		}
+		grid[row][col] = 0;
+	}
+	return 0;
+}
+
+int gen_grid() {
+	srand((int)time(NULL));
+	grid[rand() % 9][rand() % 9] = rand() % 9;
+	for (int i = 0; i < 9;) {
+		int row = rand() % 9;
+		int col = rand() % 9;
+		int val = rand() % 9;
+		
+		if (!check_neighbors(val, row - row % 3, col - col % 3, row, col)) {
+			grid[row][col] = val;
+			i++;
+		}
+	}
+	fill_cells();
+}
