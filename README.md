@@ -9,6 +9,7 @@ Todo:
 * ~~Flags~~
 * ~~Number chooser~~
 * ~~Solver/Generator~~
+* !! Split into multiple functions !!
 * !! Split into multiple files !!
 * Main menu
 * Difficulty levels
