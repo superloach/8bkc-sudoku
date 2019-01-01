@@ -167,7 +167,7 @@ void grid_choice(int gx, int gy) {
 	}
 }
 
-int Fill(int* row, int* col) {
+int Get_empty(int* row, int* col) {
 	for (int i = 0; i < 9; i++) {
 		for (int j = 0; j < 9; j++) {
 			if (grid[i][j] == 0) {
@@ -196,17 +196,11 @@ int check_neighbors (int row, int col, int num) {
 int fill_cells() {
 	int row = 0;
 	int col = 0;
-	if (Fill(&row, &col) == 0) return 1;
+	if (Get_empty(&row, &col) == 0) return 1;
 	for (int i = 1; i <= 9; i++) {
 		if(check_neighbors(row, col, i) == 0) {
 			grid[row][col] = i;
-			for (int i = 0; i < 100000000; i++) {
-				if (i == 0) i = 1;
-			}
-			grid_numbers();
-			grid_draw();
-			kcugui_flush();
-			if (fill_cells() == 1) return 1;
+			if (fill_cells()) return 1;
 		}
 		grid[row][col] = 0;
 	}
@@ -215,11 +209,11 @@ int fill_cells() {
 
 void gen_grid() {
 	srand((int)time(NULL));
-	grid[rand() % 9][rand() % 9] = rand() % 9;
+//	grid[rand() % 9][rand() % 9] = rand() % 8 + 1;
 	for (int i = 0; i < 9;) {
 		int row = rand() % 9;
 		int col = rand() % 9;
-		int val = rand() % 9;
+		int val = rand() % 8 + 1;
 
 		if (!check_neighbors(row, col, val)) {
 			grid[row][col] = val;
@@ -234,6 +228,15 @@ void app_main() {
 	kcugui_init();
 	srand((int)time(NULL));
 
+	UG_FontSelect((UG_FONT*)&FONT_4X6);
+	UG_SetForecolor(rgb(255, 255, 255));
+	UG_SetBackcolor(BACK_COLOUR);
+	UG_FillScreen(BACK_COLOUR);
+	UG_FontSetHSpace(0);
+	UG_FontSetVSpace(0);
+
+	grid_draw();
+
 	// Generate grid
 	gen_grid();
 
@@ -245,8 +248,13 @@ void app_main() {
 	}
 
 	// Empty random cells
-	for (int i = 0; i < GLOBAL_DIFF * 12; i++) {
-		grid[rand() % 9][rand() % 9] = 0;
+	for (int i = 0; i < 9 * (GLOBAL_DIFF + 1);) {
+		int x = rand() % 9;
+		int y = rand() % 9;
+		if (grid[x][y]) {
+			grid[x][y] = 0;
+			i++;
+		}
 	}
 
 	// Save game_grid
@@ -264,12 +272,6 @@ void app_main() {
 			}
 		}
 	}
-
-	UG_FontSelect((UG_FONT*)&FONT_4X6);
-	UG_SetForecolor(rgb(255, 255, 255));
-	UG_SetBackcolor(BACK_COLOUR);
-	UG_FontSetHSpace(0);
-	UG_FontSetVSpace(0);
 
 	int cx = 0;
 	int cy = 0;
