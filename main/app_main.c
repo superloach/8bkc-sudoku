@@ -200,7 +200,7 @@ int fill_cells() {
 	for (int i = 1; i <= 9; i++) {
 		if(check_neighbors(row, col, i) == 0) {
 			grid[row][col] = i;
-			for (int i = 0; i < 1000000; i++) {
+			for (int i = 0; i < 100000000; i++) {
 				if (i == 0) i = 1;
 			}
 			grid_numbers();
