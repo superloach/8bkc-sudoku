@@ -194,18 +194,18 @@ int check_neighbors (int row, int col, int num) {
 }   
 
 int fill_cells() {
-	grid_numbers();
-	grid_draw();
-	kcugui_flush();
-	for (int i = 0; i < 5000000; i++) {
-		if (i == 0) i = 1;
-	}
 	int row = 0;
 	int col = 0;
 	if (Fill(&row, &col) == 0) return 1;
 	for (int i = 1; i <= 9; i++) {
 		if(check_neighbors(row, col, i) == 0) {
 			grid[row][col] = i;
+			for (int i = 0; i < 1000000; i++) {
+				if (i == 0) i = 1;
+			}
+			grid_numbers();
+			grid_draw();
+			kcugui_flush();
 			if (fill_cells() == 1) return 1;
 		}
 		grid[row][col] = 0;
