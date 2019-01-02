@@ -107,7 +107,7 @@ int number_choice(int gx, int gy, int backout) {
 		if (key & KC_BTN_UP) cursor = (cursor + 8) % 10;
 		if (key & KC_BTN_DOWN) cursor = (cursor + 2) % 10;
 		if (key & KC_BTN_A) return cursor;
-		if (backout != 0 && (key & KC_BTN_B)) return backout;
+		if (key & KC_BTN_B) return backout;
 
 		kcugui_flush();
 	}
