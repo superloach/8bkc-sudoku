@@ -8,8 +8,9 @@
 #define BACK_COLOUR rgb(0,   0,   0  )
 #define ALT1_COLOUR rgb(0,   255, 255)
 #define ALT2_COLOUR rgb(255, 0,   255)
-
 #define GLOBAL_DIFF 1
+
+#define len(x) (sizeof(x) / sizeof((x)[0]))
 
 /*
  Sudoku.
@@ -30,6 +31,11 @@ int getkey() {
 	int ret = (old ^ new) & new;
 	old = new;
 	return ret;
+}
+
+void exit_app() {
+	// todo - add appfs save state
+	kchal_exit_to_chooser();
 }
 
 void mark_set(int x, int y, int value) {
@@ -95,7 +101,7 @@ void mark_choice(int gx, int gy) {
 
 		int key = getkey();
 
-		if (key & KC_BTN_POWER) kchal_exit_to_chooser();
+		if (key & KC_BTN_POWER) exit_app();
 		if (key & KC_BTN_LEFT) cursor = (cursor + 9) % 10;
 		if (key & KC_BTN_RIGHT) cursor = (cursor + 1) % 10;
 		if (key & KC_BTN_UP) cursor = (cursor + 8) % 10;
@@ -155,7 +161,7 @@ void grid_choice(int gx, int gy) {
 
 		int key = getkey();
 
-		if (key & KC_BTN_POWER) kchal_exit_to_chooser();
+		if (key & KC_BTN_POWER) exit_app();
 		if (key & KC_BTN_LEFT) cursor = (cursor + 9) % 10;
 		if (key & KC_BTN_RIGHT) cursor = (cursor + 1) % 10;
 		if (key & KC_BTN_UP) cursor = (cursor + 8) % 10;
@@ -191,7 +197,7 @@ int check_neighbors (int row, int col, int num) {
 		}
 	}
 	return 0;
-}   
+}
 
 int fill_cells() {
 	int row = 0;
@@ -223,20 +229,16 @@ void gen_grid() {
 	fill_cells();
 }
 
-void app_main() {
-	kchal_init();
-	kcugui_init();
-	srand((int)time(NULL));
-
+void ugui_init() {
 	UG_FontSelect((UG_FONT*)&FONT_4X6);
-	UG_SetForecolor(rgb(255, 255, 255));
+	UG_SetForecolor(FORE_COLOUR);
 	UG_SetBackcolor(BACK_COLOUR);
 	UG_FillScreen(BACK_COLOUR);
 	UG_FontSetHSpace(0);
 	UG_FontSetVSpace(0);
+}
 
-	grid_draw();
-
+void grid_init() {
 	// Generate grid
 	gen_grid();
 
@@ -273,8 +275,31 @@ void app_main() {
 		}
 	}
 
+}
+
+int check_done() {
+	for (int i = 0; i < 9; i++) {
+		for (int j = 0; j < 9; j++) {
+			if (grid[i][j] != full_grid[i][j]) {
+				return 0;
+			}
+		}
+	}
+	return 1;
+}
+
+void solved() {
+	UG_FillScreen(BACK_COLOUR);
+	UG_PutString(30, 20, "you solved it");
+	UG_PutString(30, 40, "press any key");
+	while (!kchal_get_keys()) {}
+}
+
+void run_game() {
 	int cx = 0;
 	int cy = 0;
+
+	grid_init();
 
 	while (1) {
 		int key = getkey();
@@ -286,7 +311,9 @@ void app_main() {
 		grid_cursor(cx, cy);  // main cursor
 		mark_display(cx, cy); // show marks
 
-		if (key & KC_BTN_POWER) kchal_exit_to_chooser();
+		if (check_done()) return solved();
+
+		if (key & KC_BTN_POWER) exit_app();
 		if (key & KC_BTN_LEFT)  cx = (cx + 8) % 9;
 		if (key & KC_BTN_RIGHT) cx = (cx + 1) % 9;
 		if (key & KC_BTN_UP)    cy = (cy + 8) % 9;
@@ -295,5 +322,45 @@ void app_main() {
 		if (key & KC_BTN_B) mark_choice(cx, cy);
 
 		kcugui_flush();
+	}
+}
+
+int main_menu() {
+	int choice = 0;
+	char choices[][10] = {"start", "quit"};
+
+	while (1) {
+		int key = getkey();
+
+		UG_FillScreen(BACK_COLOUR);
+		UG_SetForecolor(ALT1_COLOUR);
+		UG_PutString(30, 20, "sudoku");
+
+		for (int i = 0; i < len(choices); i++) {
+			UG_SetForecolor(FORE_COLOUR);
+			if (choice == i) UG_SetForecolor(ALT2_COLOUR);
+
+			UG_PutString(30, 30 + 8 * i, (char*)&(choices[i]));
+		}
+
+		if (key & KC_BTN_UP) choice = (choice + len(choices) - 1) % len(choices);
+		if (key & KC_BTN_DOWN) choice = (choice + len(choices) + 1) % len(choices);
+		if (key & KC_BTN_A) return choice;
+
+		kcugui_flush();
+	}
+}
+
+void app_main() {
+	kchal_init();
+	kcugui_init();
+	ugui_init();
+	srand((int)time(NULL));
+
+	while (1) {
+		int option = main_menu();
+
+		if (option == 0) run_game();
+		if (option == 1) exit_app();
 	}
 }
