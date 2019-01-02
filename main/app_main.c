@@ -292,7 +292,7 @@ void solved() {
 	UG_FillScreen(BACK_COLOUR);
 	UG_PutString(30, 20, "you solved it");
 	UG_PutString(30, 40, "press any key");
-	while (!kchal_get_keys()) {}
+	while (!getkey()) {}
 }
 
 void run_game() {
