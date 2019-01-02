@@ -89,7 +89,7 @@ void mark_display(int gx, int gy) {
 	}
 }
 
-void mark_choice(int gx, int gy) {
+int number_choice(int gx, int gy, int backout) {
 	int cursor = 0;
 	while (1) {
 		mark_display(gx, gy);
@@ -106,11 +106,15 @@ void mark_choice(int gx, int gy) {
 		if (key & KC_BTN_RIGHT) cursor = (cursor + 1) % 10;
 		if (key & KC_BTN_UP) cursor = (cursor + 8) % 10;
 		if (key & KC_BTN_DOWN) cursor = (cursor + 2) % 10;
-		if (key & KC_BTN_A) mark_set(gx, gy, cursor);
-		if (key & KC_BTN_B) return;
+		if (key & KC_BTN_A) return cursor;
+		if (backout && (key & KC_BTN_B)) return -1;
 
 		kcugui_flush();
 	}
+}
+
+void mark_choice(int gx, int gy) {
+	mark_set(gx, gy, number_choice(gx, gy, 1));
 }
 
 void grid_draw() {
@@ -150,27 +154,7 @@ void grid_cursor(int gx, int gy) {
 }
 
 void grid_choice(int gx, int gy) {
-	int cursor = 0;
-	while (1) {
-		mark_display(gx, gy);
-		if (mark[gx][gy][cursor]) {
-			mark_cursor(cursor, ALT2_COLOUR);
-			kcugui_flush();
-		}
-		mark_cursor(cursor, ALT1_COLOUR);
-
-		int key = getkey();
-
-		if (key & KC_BTN_POWER) exit_app();
-		if (key & KC_BTN_LEFT) cursor = (cursor + 9) % 10;
-		if (key & KC_BTN_RIGHT) cursor = (cursor + 1) % 10;
-		if (key & KC_BTN_UP) cursor = (cursor + 8) % 10;
-		if (key & KC_BTN_DOWN) cursor = (cursor + 2) % 10;
-		if (key & KC_BTN_A) return grid_set(gx, gy, cursor);
-		if (key & KC_BTN_B) return;
-
-		kcugui_flush();
-	}
+	grid_set(gx, gy, number_choice(gx, gy, 1));
 }
 
 int Get_empty(int* row, int* col) {
@@ -292,7 +276,11 @@ void solved() {
 	UG_FillScreen(BACK_COLOUR);
 	UG_PutString(30, 20, "you solved it");
 	UG_PutString(30, 40, "press any key");
-	while (!getkey()) {}
+	while (1) {
+		int key = getkey();
+		if (key & KC_BTN_POWER) exit_app();
+		if (key) return;
+	}
 }
 
 void run_game() {
