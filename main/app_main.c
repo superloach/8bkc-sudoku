@@ -56,7 +56,7 @@ void show_number(int x, int y, int value) {
 	UG_PutString(x, y, (char*)&str);
 }
 
-void mark_numbers() {
+void side_numbers() {
 	for (int i = 0; i < 10; i++) {
 		int x = 67 + ((i % 2) * 6);
 		int y = 3 + ((int)(i / 2) * 8);
@@ -64,7 +64,7 @@ void mark_numbers() {
 	}
 }
 
-void mark_cursor(int num, int colour) {
+void side_cursor(int num, int colour) {
 	int nx = 67 + ((num % 2) * 6);
 	int ny = 3 + ((int)(num / 2) * 8);
 	for (int x = nx - 1; x < nx + 5; x++) {
@@ -81,23 +81,23 @@ void mark_cursor(int num, int colour) {
 	}
 }
 
-void mark_display(int gx, int gy) {
-	mark_numbers();
+void side_display(int gx, int gy) {
+	side_numbers();
 	for (int i = 0; i < 10; i++) {
-		mark_cursor(i, BACK_COLOUR);
-		if (mark[gx][gy][i]) mark_cursor(i, ALT2_COLOUR);
+		side_cursor(i, BACK_COLOUR);
+		if (mark[gx][gy][i]) side_cursor(i, ALT2_COLOUR);
 	}
 }
 
 int number_choice(int gx, int gy, int backout) {
 	int cursor = 0;
 	while (1) {
-		mark_display(gx, gy);
+		side_display(gx, gy);
 		if (mark[gx][gy][cursor]) {
-			mark_cursor(cursor, ALT2_COLOUR);
+			side_cursor(cursor, ALT2_COLOUR);
 			kcugui_flush();
 		}
-		mark_cursor(cursor, ALT1_COLOUR);
+		side_cursor(cursor, ALT1_COLOUR);
 
 		int key = getkey();
 
@@ -222,7 +222,7 @@ void ugui_init() {
 	UG_FontSetVSpace(0);
 }
 
-void grid_init() {
+void grid_init(int diff) {
 	// Generate grid
 	gen_grid();
 
@@ -234,7 +234,7 @@ void grid_init() {
 	}
 
 	// Empty random cells
-	for (int i = 0; i < 9 * (GLOBAL_DIFF + 1);) {
+	for (int i = 0; i < 3 * (diff + 1);) {
 		int x = rand() % 9;
 		int y = rand() % 9;
 		if (grid[x][y]) {
@@ -283,11 +283,11 @@ void solved() {
 	}
 }
 
-void run_game() {
+void run_game(int diff) {
 	int cx = 0;
 	int cy = 0;
 
-	grid_init();
+	grid_init(diff);
 
 	while (1) {
 		int key = getkey();
@@ -297,7 +297,7 @@ void run_game() {
 		grid_numbers();       // numbers on grid
 		grid_draw();          // grid lines
 		grid_cursor(cx, cy);  // main cursor
-		mark_display(cx, cy); // show marks
+		side_display(cx, cy); // show marks
 
 		if (check_done()) return solved();
 
@@ -348,7 +348,15 @@ void app_main() {
 	while (1) {
 		int option = main_menu();
 
-		if (option == 0) run_game();
+		if (option == 0) {
+			int diff = 0;
+			while (diff == 0) {
+				diff = number_choice(0, 0, -1);
+			}
+			if (diff != -1) {
+				run_game(diff);
+			}
+		}
 		if (option == 1) exit_app();
 	}
 }
