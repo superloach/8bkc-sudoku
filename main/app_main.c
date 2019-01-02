@@ -107,14 +107,14 @@ int number_choice(int gx, int gy, int backout) {
 		if (key & KC_BTN_UP) cursor = (cursor + 8) % 10;
 		if (key & KC_BTN_DOWN) cursor = (cursor + 2) % 10;
 		if (key & KC_BTN_A) return cursor;
-		if (backout && (key & KC_BTN_B)) return -1;
+		if (backout != 0 && (key & KC_BTN_B)) return backout;
 
 		kcugui_flush();
 	}
 }
 
 void mark_choice(int gx, int gy) {
-	mark_set(gx, gy, number_choice(gx, gy, 1));
+	mark_set(gx, gy, number_choice(gx, gy, -1));
 }
 
 void grid_draw() {
@@ -154,7 +154,7 @@ void grid_cursor(int gx, int gy) {
 }
 
 void grid_choice(int gx, int gy) {
-	grid_set(gx, gy, number_choice(gx, gy, 1));
+	grid_set(gx, gy, number_choice(gx, gy, 0));
 }
 
 int Get_empty(int* row, int* col) {
